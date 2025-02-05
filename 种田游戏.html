@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>种田游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-canvas {
+            border: 1px solid black;
+        }
+
+        #shop, #inventory {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid black;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        <div id="shop">
+            <h2>商店</h2>
+            <button onclick="buySeed('carrot')">购买胡萝卜种子</button>
+            <button onclick="buySeed('potato')">购买土豆种子</button>
+        </div>
+        <div id="inventory">
+            <h2>背包</h2>
+            <div id="inventory-items"></div>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+
+        const farm = [];
+        const inventory = [];
+
+        // 初始化农场
+        for (let i = 0; i < 10; i++) {
+            farm[i] = [];
+            for (let j = 0; j < 10; j++) {
+                farm[i][j] = null;
+            }
+        }
+
+        // 绘制农场
+        function drawFarm() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < farm.length; i++) {
+                for (let j = 0; j < farm[i].length; j++) {
+                    if (farm[i][j]) {
+                        ctx.fillStyle = 'green';
+                        ctx.fillRect(j * 40, i * 40, 40, 40);
+                    } else {
+                        ctx.fillStyle = 'brown';
+                        ctx.fillRect(j * 40, i * 40, 40, 40);
+                    }
+                }
+            }
+        }
+
+        // 种植作物
+        function plantCrop(x, y, crop) {
+            farm[x][y] = crop;
+            drawFarm();
+        }
+
+        // 购买种子
+        function buySeed(seedType) {
+            inventory.push(seedType);
+            updateInventory();
+        }
+
+        // 更新背包
+        function updateInventory() {
+            const inventoryDiv = document.getElementById('inventory-items');
+            inventoryDiv.innerHTML = '';
+            inventory.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.textContent = item;
+                inventoryDiv.appendChild(itemDiv);
+            });
+        }
+
+        // 点击农场格子
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / 40);
+            const y = Math.floor((e.clientY - rect.top) / 40);
+            if (inventory.length > 0) {
+                plantCrop(x, y, inventory.pop());
+                updateInventory();
+            }
+        });
+
+        drawFarm();
+    </script>
+</body>
+</html>
