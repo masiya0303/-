@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单点击游戏</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffe4e1; /* 修改为浅粉色 */
+            flex-direction: column;
+        }
+        .game-container {
+            width: 90%;
+            height: 80%;
+            position: relative;
+            background-color: #87e0a3;
+            border: 2px solid #000;
+            overflow: hidden;
+            touch-action: none; /* 防止默认触摸行为 */
+            display: none; /* 初始隐藏游戏容器 */
+        }
+        .ball {
+            width: 50px;
+            height: 50px;
+            background-color: red;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+        }
+        .score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: white;
+        }
+        .time {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: white;
+        }
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            color: white;
+            text-align: center;
+            display: none;
+        }
+        .start-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .start-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container" id="gameContainer">
+        <div class="ball" id="ball"></div>
+        <div class="score" id="score">Score: 0</div>
+        <div class="time" id="time">Time: 30</div>
+        <div class="game-over" id="gameOver">Game Over! Your Score: 0</div>
+    </div>
+    <button class="start-button" id="startButton">Start Game</button>
+
+    <script>
+        const gameContainer = document.getElementById('gameContainer');
+        const ball = document.getElementById('ball');
+        const scoreElement = document.getElementById('score');
+        const timeElement = document.getElementById('time');
+        const gameOverElement = document.getElementById('gameOver');
+        const startButton = document.getElementById('startButton');
+        let score = 0;
+        let time = 30; // 游戏时间（秒）
+        let timer;
+
+        // 随机生成小球位置
+        function randomPosition() {
+            const containerWidth = gameContainer.clientWidth;
+            const containerHeight = gameContainer.clientHeight;
+            const ballWidth = ball.clientWidth;
+            const ballHeight = ball.clientHeight;
+
+            const x = Math.random() * (containerWidth - ballWidth);
+            const y = Math.random() * (containerHeight - ballHeight);
+
+            ball.style.left = `${x}px`;
+            ball.style.top = `${y}px`;
+        }
+
+        // 更新分数
+        function updateScore() {
+            score++;
+            scoreElement.textContent = `Score: ${score}`;
+        }
+
+        // 更新时间
+        function updateTime() {
+            time--;
+            timeElement.textContent = `Time: ${time}`;
+
+            if (time <= 0) {
+                clearInterval(timer);
+                gameOver();
+            }
+        }
+
+        // 游戏结束
+        function gameOver() {
+            ball.style.display = 'none'; // 隐藏小球
+            gameOverElement.style.display = 'block'; // 显示游戏结束信息
+            gameOverElement.textContent = `Game Over! Your Score: ${score}`;
+        }
+
+        // 点击小球事件
+        ball.addEventListener('click', () => {
+            updateScore();
+            randomPosition();
+        });
+
+        // 触摸小球事件（移动端支持）
+        ball.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // 防止默认触摸行为
+            updateScore();
+            randomPosition();
+        });
+
+        // 开始游戏
+        function startGame() {
+            score = 0; // 重置分数
+            time = 30; // 重置时间
+            scoreElement.textContent = `Score: ${score}`;
+            timeElement.textContent = `Time: ${time}`;
+            gameOverElement.style.display = 'none'; // 隐藏游戏结束信息
+            ball.style.display = 'block'; // 显示小球
+            gameContainer.style.display = 'block'; // 显示游戏容器
+            randomPosition();
+            timer = setInterval(updateTime, 1000); // 每秒更新时间
+        }
+
+        // 点击开始按钮
+        startButton.addEventListener('click', () => {
+            startGame();
+        });
+    </script>
+</body>
+</html>
